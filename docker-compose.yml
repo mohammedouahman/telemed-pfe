@@ -1,0 +1,76 @@
+version: '3.8'
+
+services:
+
+  db:
+    image: mysql:8.0
+    container_name: telemed_db
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: telemed_db
+      MYSQL_USER: telemed
+      MYSQL_PASSWORD: telemed123
+      MYSQL_ROOT_PASSWORD: root_secret
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - telemed_network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+
+  backend:
+    build:
+      context: ./telemed-backend
+      dockerfile: Dockerfile
+    container_name: telemed_backend
+    restart: unless-stopped
+    working_dir: /var/www
+    volumes:
+      - ./telemed-backend:/var/www
+      - /var/www/vendor
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - telemed_network
+
+  nginx:
+    image: nginx:alpine
+    container_name: telemed_nginx
+    restart: unless-stopped
+    ports:
+      - "8000:80"
+    volumes:
+      - ./telemed-backend:/var/www
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - backend
+    networks:
+      - telemed_network
+
+  frontend:
+    image: node:20-alpine
+    container_name: telemed_frontend
+    restart: unless-stopped
+    working_dir: /app
+    volumes:
+      - ./telemed-frontend:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    depends_on:
+      - nginx
+    networks:
+      - telemed_network
+
+volumes:
+  db_data:
+
+networks:
+  telemed_network:
+    driver: bridge

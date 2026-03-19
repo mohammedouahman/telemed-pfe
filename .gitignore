@@ -1,0 +1,15 @@
+# Laravel
+telemed-backend/.env
+telemed-backend/vendor/
+telemed-backend/storage/logs/*.log
+
+# React
+telemed-frontend/node_modules/
+telemed-frontend/dist/
+
+# Docker volumes
+docker/mysql/
+
+# OS
+.DS_Store
+Thumbs.db
