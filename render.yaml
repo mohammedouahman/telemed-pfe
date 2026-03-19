@@ -1,0 +1,54 @@
+services:
+  - type: web
+    name: telemed-backend
+    runtime: php
+    rootDir: telemed-backend
+    buildCommand: composer install --no-dev --optimize-autoloader && php artisan config:cache && php artisan route:cache
+    startCommand: php artisan migrate --seed --force && php artisan serve --host=0.0.0.0 --port=$PORT
+    envVars:
+      - key: APP_NAME
+        value: TeleMed
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_KEY
+        value: base64:2452ucza6/iv2TF9/p1Qvdqbau4qhAd9/4JfYBU0cCM=
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        fromDatabase:
+          name: telemed-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: telemed-db
+          property: port
+      - key: DB_DATABASE
+        fromDatabase:
+          name: telemed-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: telemed-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: telemed-db
+          property: password
+      - key: SESSION_DRIVER
+        value: database
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: database
+      - key: FILESYSTEM_DISK
+        value: local
+      - key: FRONTEND_URL
+        value: https://telemed-pfe.vercel.app
+      - key: SANCTUM_STATEFUL_DOMAINS
+        value: telemed-pfe.vercel.app
+
+databases:
+  - name: telemed-db
+    plan: free
