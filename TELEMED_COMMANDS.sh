@@ -274,7 +274,7 @@ git add .
 git commit -m "feat: add Docker setup for local development"
 
 # Create repo on github.com then:
-git remote add origin https://github.com/YOUR_USERNAME/telemed-pfe.git
+git remote add origin git@github.com:mohammedouahman/telemed-pfe.git
 git branch -M main
 git push -u origin main
 
