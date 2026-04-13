@@ -51,6 +51,22 @@ services:
     networks:
       - telemed_network
 
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: telemed_phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8888:80"
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: root_secret
+    depends_on:
+      db:
+        condition: service_healthy
+    networks:
+      - telemed_network
+
   frontend:
     image: node:20-alpine
     container_name: telemed_frontend
